@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINI SPA</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+
+</head>
+
+<body>
+
+
+    <div id="app">
+        <nav class="container">
+            <ul>
+                <li><strong>MINI SPA</strong></li>
+            </ul>
+            <ul>
+                <li><a href="#" @click="showMenu('home')">Home</a></li>
+                <li><a href="#" @click="showMenu('about')">About</a></li>
+                <li><a href="#" @click="showMenu('wine')">Vinos</a></li>
+                <li><a href="#" @click="showMenu('contact')">Contact</a></li>
+            </ul>
+        </nav>
+
+        <main class="container">
+            <div class="grid">
+
+                <div v-show="home">
+                    <home-component></home-component>
+                </div>
+
+                <div v-show="about">
+                    <about-component></about-component>
+                </div>
+
+                <div v-show="wine">
+                    <wine-component></wine-component>
+
+                    <article v-if="loading">
+                        <table>
+                            <thead>
+                                <th>winery</th>
+                                <th>wine</th>
+                            </thead>
+                            <tbody>
+
+                                <tr v-for="wine of wines">
+                                    <td>{{wine.winery}}</td>
+                                    <td>{{wine.wine}}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </article>
+
+                    <div v-else>
+                        <article aria-busy="true"></article>
+                    </div>
+
+                </div>
+
+                <div v-show="contact">
+                    <contact-component></contact-component>
+
+                    <input type="text" id="kilometros" v-model="kilometros" placeholder="Kilometros">
+                    <input type="text" id="metros" v-model="metros" placeholder="Metros">
+
+                </div>
+
+            </div>
+        </main>
+
+
+        <footer class="container">
+            <small>Copyrigth 2022</small>
+        </footer>
+
+    </div>
+
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script src="./js/components.js"></script>
+    <script src="./js/app.js"></script>
+
+</body>
+
+</html>
