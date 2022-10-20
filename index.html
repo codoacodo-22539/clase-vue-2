@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MINI SPA</title>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
@@ -21,6 +21,7 @@
             <ul>
                 <li><a href="#" @click="showMenu('home')">Home</a></li>
                 <li><a href="#" @click="showMenu('about')">About</a></li>
+                <li><a href="#" @click="showMenu('wineFilter')">Filtros Vinos</a></li>
                 <li><a href="#" @click="showMenu('wine')">Vinos</a></li>
                 <li><a href="#" @click="showMenu('contact')">Contact</a></li>
             </ul>
@@ -35,6 +36,39 @@
 
                 <div v-show="about">
                     <about-component></about-component>
+                </div>
+
+
+                <div v-show="wineFilter">
+                    <h1>Filtro de Vinos</h1>
+                    <form @submit.prevent="getWines">
+                        <input type="text" placeholder="Buscar Vino" ref="search">
+                        <label for="location">Ubicacion</label>
+                        <select>
+                            <option id="location" v-for="item of itemWines">
+                                {{item.winery}}
+                            </option>
+                        </select>
+                        <button type="submit">Buscar Vino</button>
+                    </form>
+
+                    <article v-if="loadingFilter">
+                        <div class="grid-container">
+                            <div class="grid-item" v-for="wine of winesByNameTitle">
+                                <img v-bind:src="wine.image" v-bind:alt="wine.winery">
+                                <div>
+                                    <h3>{{wine.winery}}</h3>
+                                    <h4>{{wine.wine}}</h4>
+                                    <h4>{{wine.rating.average}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div v-else>
+                        <article aria-busy="true"></article>
+                    </div>
+
                 </div>
 
                 <div v-show="wine">

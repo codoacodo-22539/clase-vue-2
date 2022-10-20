@@ -6,7 +6,6 @@ const fetchApp = (url) => {
         .catch(error => console.log(error));
 }
 
-
 const app = createApp({ //Es una instancia de Vue
     components: {
         'home-component': Home, //El nombre del componente es home-component y el valor es el objeto Home
@@ -18,24 +17,28 @@ const app = createApp({ //Es una instancia de Vue
         return {
             home: false,
             about: false,
+            wineFilter: false,
             wine: false,
             contact: false,
             url: 'https://api.sampleapis.com/wines/reds',
-            wines: [],
+            wines: [], //TODOS LOS VINOS
+            winesByNameTitle: [], // FILTRADO POR TIPO DE VINO
+            itemWines: [],
             loading: false,
+            loading: true,
             kilometros: 0,
             metros: 0,
         }
     },
     watch: { //Es un objeto que tiene como propiedades funciones
-        kilometros(value){ //value es el valor que tiene la propiedad kilometros
-            
+        kilometros(value) { //value es el valor que tiene la propiedad kilometros
+
             this.kilometros = value;
-            this.metros = value * 1000; 
+            this.metros = value * 1000;
 
         },
-        metros(value){ //value es el valor que tiene la propiedad metros
-            
+        metros(value) { //value es el valor que tiene la propiedad metros
+
             this.kilometros = value / 1000;
             this.metros = value;
 
@@ -44,48 +47,67 @@ const app = createApp({ //Es una instancia de Vue
     },
     methods: { //Metodos de la instancia de Vue
         async showMenu(component) { //Metodo para mostrar el menu
-            console.log(component);
+            //console.log(component);
 
-            if (component == 'home') {
-                this.home = true;
-                this.about = false;
-                this.wine = false;
-                this.contact = false;
+            this.home = false;
+            this.about = false;
+            this.wineFilter = false;
+            this.wine = false;
+            this.contact = false;
+
+            switch (component) {
+                case 'home':
+                    this.home = true;
+                    break;
+                case 'about':
+                    this.about = true;
+                    break;
+                case 'wineFilter':
+                    this.wineFilter = true;
+                    this.loadingFilter = true;
+
+                    const infoLocations = await fetchApp(this.url); //Espera a que se resuelva la promesa
+
+                    this.itemWines = infoLocations.filter((wine) => (wine.winery == 'Bond' || wine.winery == 'Maselva')); //Filtramos los vinos que tengan la bodega Bond o Malselva
+
+
+                    break;
+                case 'wine':
+                    this.wine = true;
+
+                    const infoApp = await fetchApp(this.url); //Espera a que se resuelva la promesa
+
+                    this.wines = infoApp.filter((wine) => (wine.winery == 'Bond' || wine.winery == 'Maselva')); //Filtramos los vinos que tengan la bodega Bond o Malselva
+
+                    this.loading = true; //Cambia el estado de la variable loading a true
+
+                    break;
+                case 'contact':
+                    this.contact = true;
+                    break;
+                default:
+                    this.home = true;
             }
 
-            if (component == 'about') {
-                this.home = false;
-                this.about = true;
-                this.wine = false;
-                this.contact = false;
-            }
+        },
+        async getWines() {
 
-            if (component == 'wine') {
-                this.home = false;
-                this.about = false;
-                this.wine = true;
-                this.contact = false;
+            this.loadingFilter = false;
 
-                const infoApp = await fetchApp(this.url); //Espera a que se resuelva la promesa
+            console.log(this.$refs.search.value); //Muestra todos los elementos del DOM
 
-                this.wines = infoApp.filter((wine) => (wine.winery == 'Bond' || wine.winery == 'Maselva')); //Filtramos los vinos que tengan la bodega Bond o Malselva
+            const search = this.$refs.search.value; //Obtenemos el valor del input
+            const infoApp = await fetchApp(this.url); //Espera a que se resuelva la promesa
 
-                this.loading = true; //Cambia el estado de la variable loading a true
+            // console.log(infoApp);
+            //Filtramos los vinos que tengan el nombre que se ha introducido en el input)
+            this.winesByNameTitle = infoApp.filter((wine) => {
+                return wine.winery.trim().toUpperCase() == search.trim().toUpperCase()
+            });
 
-
-            }
-
-            if (component == 'contact') {
-                this.home = false;
-                this.about = false;
-                this.wine = false;
-                this.contact = true;
-            }
-
-
-
-
+            this.loadingFilter = true;
         }
+
     }
 
 }).mount('#app'); //Monto la app en el elemento con id app
